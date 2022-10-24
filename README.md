@@ -102,3 +102,61 @@ VmData:    18268 kB
 ```
 
 The momory usage kept increasing.
+
+## Test for a user provided code
+
+Just compile `./test_code/MessageGenerator.cpp` instead of `main.cc`. Other steps are the same.
+
+```bash
+cd /app/test_code
+g++ MessageGenerator.cpp -std=c++11 -Wl,-rpath=/usr/lib -lpulsar
+```
+
+You need to press any key after running `./a.out` to begin producing messages. You can see how the memory usages changed with candidate-3:
+
+```
+LOOP_CNT: 72
++ cat /proc/4183/status
++ grep VmData
+VmData:      548 kB
++ set +x
+LOOP_CNT: 73
++ cat /proc/4183/status
++ grep VmData
+VmData:    17552 kB
+...
+LOOP_CNT: 171
++ cat /proc/4183/status
++ grep VmData
+VmData:    17552 kB
+```
+
+However, with candidate-2, you can see:
+
+```
++ cat /proc/5367/status
++ grep VmData
+VmData:      548 kB
++ set +x
+LOOP_CNT: 2
++ cat /proc/5367/status
++ grep VmData
+VmData:    18328 kB
++ set +x
+LOOP_CNT: 3
++ cat /proc/5367/status
++ grep VmData
+VmData:    19552 kB
++ set +x
+LOOP_CNT: 4
++ grep VmData
++ cat /proc/5367/status
+VmData:    20764 kB
+...
++ cat /proc/5367/status
++ grep VmData
+VmData:    22324 kB
++ set +x
+```
+
+The memory usage was increasing until the producing ends (you can see the `After sending message` output from `./a.out`).
